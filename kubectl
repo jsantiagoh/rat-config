@@ -1,7 +1,12 @@
 mode contexts
     annotate match  ctx                  -- kubectl config get-contexts -o='name'
-    bindkey enter   ctx namespaces       -- >kubectl get namespace --context $ctx --no-headers=true
-    bindkey n       ctx  nodes           -- >kubectl get nodes --context $ctx --no-headers=true
+    bindkey enter   ctx  namespaces      -- kubectl get namespace --context $ctx --no-headers=true
+    bindkey n       ctx  nodes           -- kubectl get nodes --context $ctx --no-headers=true
+end
+
+mode nodes
+    annotate match  node                -- kubectl get nodes --context $ctx -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+    bindkey  v      node    preview     -- kubectl describe node $node --context $ctx
 end
 
 mode namespaces
@@ -10,16 +15,11 @@ mode namespaces
     bindkey s       ns  secrets         -- >kubectl get secrets --context $ctx -n $ns --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
 end
 
-mode nodes
-    annotate regex  node                -- ^\S*
-    bindkey  enter  node    preview     -- kubectl describe node $node --context $ctx
-end
-
 mode pods
-    annotate match pod -- kubectl get pods --context $ctx -n $ns -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
+    annotate match  pod                 -- kubectl get pods --context $ctx -n $ns -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
     bindkey enter   pod     containers  -- >kubectl get pods --context $ctx -n $ns $pod -o go-template --template='{{range .spec.containers}}{{.name}}{{"\n"}}{{end}}'
     bindkey l       pod     preview     -- kubectl logs -f --context $ctx -n $ns $pod
-    bindkey d       pod                 -- ! kubectl describe pod --context $ctx -n $ns $pod | bat
+    bindkey v       pod     preview     -- kubectl describe pod --context $ctx -n $ns $pod
     bindkey e       pod                 -- !kubectl exec -ti --context $ctx -n $ns $pod -- bash
     bindkey S-d     pod                 -- ?!kubectl delete pod --context $ctx -n $ns $pod
 end
@@ -32,12 +32,12 @@ mode containers
 end
 
 mode secrets
-    annotate match secret -- kubectl get secrets --context $ctx -n $ns --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
+    annotate match  secret              -- kubectl get secrets --context $ctx -n $ns --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
     bindkey enter   secret   secretKeys -- >kubectl --context $ctx -n $ns get secret $secret -o json | jq -r '.data | keys[]'
-    bindkey d       secret   preview    -- kubectl --context $ctx -n $ns get secret $secret -o json
+    bindkey v       secret   preview    -- kubectl --context $ctx -n $ns get secret $secret -o json
 end
 
 mode secretKeys
-    annotate match key -- kubectl --context $ctx -n $ns get secret $secret -o json | jq -r '.data | keys[]'
-    bindkey enter  key preview -- >kubectl --context $ctx -n $ns get secret $secret -o json | jq -r ".data.$key" | base64 --decode
+    annotate match  key                 -- kubectl --context $ctx -n $ns get secret $secret -o json | jq -r '.data | keys[]'
+    bindkey enter   key     preview     -- >kubectl --context $ctx -n $ns get secret $secret -o json | jq -r ".data.$key" | base64 --decode
 end
