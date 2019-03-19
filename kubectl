@@ -1,7 +1,7 @@
 mode contexts
-    annotate match  ctx                  -- kubectl config get-contexts -o='name'
-    bindkey enter   ctx  namespaces      -- kubectl get namespace --context $ctx --no-headers=true
-    bindkey n       ctx  nodes           -- kubectl get nodes --context $ctx --no-headers=true
+    annotate match  ctx                 -- kubectl config get-contexts -o='name'
+    bindkey enter   ctx  namespaces     -- kubectl get namespace --context $ctx --no-headers=true
+    bindkey n       ctx  nodes          -- kubectl get nodes --context $ctx --no-headers=true
 end
 
 mode nodes
@@ -31,7 +31,7 @@ mode pods
 end
 
 mode containers
-    annotate match container -- kubectl get pods $pod --context $ctx -n $ns -o go-template --template='{{range .spec.containers}}{{.name}}{{"\n"}}{{end}}'
+    annotate match container            -- kubectl get pods $pod --context $ctx -n $ns -o go-template --template='{{range .spec.containers}}{{.name}}{{"\n"}}{{end}}'
 
     bindkey enter   container           -- !kubectl exec -ti --context $ctx -n $ns $pod -c $container -- bash
     bindkey l       container preview   -- kubectl logs -f --context $ctx -n $ns $pod -c $container
