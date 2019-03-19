@@ -13,6 +13,12 @@ mode namespaces
     annotate match  ns                  -- kubectl get namespace --context $ctx -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
     bindkey enter   ns  pods            -- >kubectl get pods --context $ctx -n $ns --no-headers=true
     bindkey s       ns  secrets         -- >kubectl get secrets --context $ctx -n $ns --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}'
+    bindkey d       ns  deployments     -- kubectl get deployments --context $ctx -n $ns --no-headers=true
+end
+
+mode deployments
+    annotate match  deployment          -- kubectl get deployments --context $ctx -n $ns -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+    bindkey  v      deployment preview  -- kubectl describe deployment --context $ctx -n $ns $deployment
 end
 
 mode pods
