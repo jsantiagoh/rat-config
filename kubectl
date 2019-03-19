@@ -45,5 +45,5 @@ end
 
 mode secretKeys
     annotate match  key                 -- kubectl --context $ctx -n $ns get secret $secret -o json | jq -r '.data | keys[]'
-    bindkey enter   key     preview     -- >kubectl --context $ctx -n $ns get secret $secret -o json | jq -r ".data.$key" | base64 --decode
+    bindkey enter   key     preview     -- >kubectl --context $ctx -n $ns get secret $secret -o json | jq -r ".data[\"$key\"]" | base64 --decode
 end
